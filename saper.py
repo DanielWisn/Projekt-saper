@@ -112,33 +112,39 @@ class Saper:
         self.table[self.saperY][self.saperX] = "+"
 
     def first_move(self,positionX,positionY):
-        neighbours = [
-            (positionX+1,positionY+1),
-            (positionX-1,positionY-1),
-            (positionX+1,positionY),
-            (positionX-1,positionY),
-            (positionX,positionY+1),
-            (positionX,positionY-1),
-            (positionX-1,positionY+1),
-            (positionX+1,positionY-1)]
-        if int(self.true_table[positionX][positionY]) > 0:
-            self.table[positionX][positionY] = self.true_table[positionX][positionY]
-        else:
-            for i in neighbours:
-                self.first_move(i[0],i[1])
-
-        
+            neighbours = [
+                (positionX+1,positionY+1),
+                (positionX-1,positionY-1),
+                (positionX+1,positionY),
+                (positionX-1,positionY),
+                (positionX,positionY+1),
+                (positionX,positionY-1),
+                (positionX-1,positionY+1),
+                (positionX+1,positionY-1)]
+            if int(self.true_table[positionX][positionY]) > 0:
+                self.table[positionX][positionY] = self.true_table[positionX][positionY]
+            else:
+                self.table[positionX][positionY] = " "
+                for i in neighbours:
+                    # print(positionX,positionY)
+                    # print(neighbours)
+                    # print(i)
+                    self.first_move(i[0],i[1])
+            self.is_first_move = False
     def check(self):
-        check_lose = False
-        if self.true_table[self.saperY][self.saperX] == "x":
-            check_lose = True
-        else:
+        if self.is_first_move == True:
+            self.first_move(self.saperY,self.saperX)
+        elif self.is_first_move == False:
             check_lose = False
-            self.table[self.saperY][self.saperX] = self.true_table[self.saperY][self.saperX]
+            if self.true_table[self.saperY][self.saperX] == "x":
+                check_lose = True
+            else:
+                check_lose = False
+                self.table[self.saperY][self.saperX] = self.true_table[self.saperY][self.saperX]
         
-        self.check_lose = check_lose
+            self.check_lose = check_lose
 
-        return check_lose
+            return check_lose
 
     def generate_mines(self,number):
         for i in range(number):
@@ -163,12 +169,7 @@ keyboard.on_press_key("up", lambda x: s.set_direction("up"))
 keyboard.on_press_key("down", lambda x: s.set_direction("down"))
 keyboard.on_press_key("right", lambda x: s.set_direction("right"))
 keyboard.on_press_key("space", lambda x: s.set_flag())
-
-if s.is_first_move == True:
-    keyboard.on_press_key("c", lambda x: s.first_move(s.saperY,s.saperX))
-    s.is_first_move = False
-elif s.is_first_move == False:
-    keyboard.on_press_key("c", lambda x: s.check())
+keyboard.on_press_key("c", lambda x: s.check())
 
 s.generate_true_board()
 s.generate_mines(40)
@@ -180,7 +181,7 @@ while True:
         break
     if s.direction != "stay":
         s.move_saper()
-        os.system("clear") 
+        os.system("cls") 
         s.print_board()
         #s.print_true_board()
         s.clear_trace()
